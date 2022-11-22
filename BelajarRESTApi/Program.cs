@@ -39,5 +39,23 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+//app.UseMiddleware<CustomExceptionMiddleware>();
+//app.UseMiddleware<CustomAuthHeaderMiddleware>();
+//app.UseHttpsRedirection();
+//app.UseRouting();
+//app.Use(async (context, next) =>
+//{
+//    Console.WriteLine("Hello enigma from middleware");
+//    Console.WriteLine(context.Request.Path);
+//    Console.WriteLine(context.Request.Host);
+//    await next();
+//    Console.WriteLine(context.Response.StatusCode);
+//});
+
+//app.UseEndpoints(endpoints =>
+//{
+//    // endpoints.MapGet("/", async context => { await context.Response.WriteAsync("Hello Enigma!"); });
+//    endpoints.MapControllers();
+//});
 
 app.Run();
