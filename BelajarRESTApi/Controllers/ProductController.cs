@@ -20,7 +20,7 @@ namespace BelajarRESTApi.Controllers
 
         [HttpGet("GetAllProduct")]
         [Produces("application/json")]
-        public IActionResult GetAllProduct([FromQuery] PageInfo pageinfo)
+        public async Task<IActionResult> GetAllProduct([FromQuery] PageInfo pageinfo)
         {
             //// FromBody tidak bisa di gunakan untuk method HttpGet
             //// Ada 2 cara untuk bisa mengirim parameter ke HttpGet
@@ -28,21 +28,25 @@ namespace BelajarRESTApi.Controllers
             //// 2. Gunakan FormQuery
             try
             {
-                var productList = _productAppService.GetAllProducts(pageinfo);
+                var productList = await _productAppService.GetAllProducts(pageinfo);
+                if (productList.Data.Count() < 1)
+                {
+                    return Requests.Response(this, new ApiStatus(404), null, "Not Found");
+                }
                 return Requests.Response(this, new ApiStatus(200), productList, "");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                return Requests.Response(this, new ApiStatus(404), null, ex.Message); // not found
+                return Requests.Response(this, new ApiStatus(500), null, ex.Message); // not found
             }
         }
 
         [HttpPost("SaveProduct")]
-        public IActionResult SaveProduct([FromBody] CreateProductDto model)
+        public async Task<IActionResult> SaveProduct([FromBody] CreateProductDto model)
         {
             try
             {
-                var (isAdded, isMessage) = _productAppService.Create(model);
+                var (isAdded, isMessage) = await _productAppService.Create(model);
                 if (!isAdded)
                 {
                     return Requests.Response(this, new ApiStatus(406), isMessage, "Error");
@@ -50,32 +54,37 @@ namespace BelajarRESTApi.Controllers
 
                 return Requests.Response(this, new ApiStatus(200), isMessage, "Success");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return Requests.Response(this, new ApiStatus(500), null, ex.Message);
             }
         }
 
         [HttpGet("GetProductByCode")]
-        public IActionResult GetProductByCode(string code)
+        public async Task<IActionResult> GetProductByCode(string code)
         {
             try
             {
-                var data = _productAppService.GetProductByCode(code);
+                var data = await _productAppService.GetProductByCode(code);
+                if (data == null)
+                {
+                    return Requests.Response(this, new ApiStatus(404), null, "Not Found");
+                }
+
                 return Requests.Response(this, new ApiStatus(200), data, "");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return Requests.Response(this, new ApiStatus(404), null, ex.Message); // not found
-            }            
+            }
         }
 
         [HttpDelete("DeleteProduct")]
-        public IActionResult DeleteProduct(int Id)
+        public async Task<IActionResult> DeleteProduct(int Id)
         {
             try
             {
-                var (isDeleted, isMessage) = _productAppService.Delete(Id);
+                var (isDeleted, isMessage) = await _productAppService.Delete(Id);
                 if (!isDeleted)
                 {
                     return Requests.Response(this, new ApiStatus(406), isMessage, "Error");
@@ -83,18 +92,18 @@ namespace BelajarRESTApi.Controllers
 
                 return Requests.Response(this, new ApiStatus(200), isMessage, "Success");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return Requests.Response(this, new ApiStatus(500), null, ex.Message);
             }
         }
 
         [HttpPatch("UpdateProduct")]
-        public IActionResult UpdateProduct([FromBody] UpdateProductDto model)
+        public async Task<IActionResult> UpdateProduct([FromBody] UpdateProductDto model)
         {
             try
             {
-                var (isUpdated, isMessage) = _productAppService.Update(model);
+                var (isUpdated, isMessage) = await _productAppService.Update(model);
                 if (!isUpdated)
                 {
                     return Requests.Response(this, new ApiStatus(406), isMessage, "Error");
@@ -109,11 +118,16 @@ namespace BelajarRESTApi.Controllers
         }
 
         [HttpGet("SearchProduct")]
-        public IActionResult SearchProduct(string searchString, [FromQuery] PageInfo pageInfo)
+        public async Task<IActionResult> SearchProduct(string searchString, [FromQuery] PageInfo pageInfo)
         {
             try
             {
-                var data = _productAppService.SearchProduct(searchString, pageInfo);
+                var data = await _productAppService.SearchProduct(searchString, pageInfo);
+                if (data.Data.Count() < 1)
+                {
+                    return Requests.Response(this, new ApiStatus(404), null, "Not Found");
+                }
+
                 return Requests.Response(this, new ApiStatus(200), data, "");
             }
             catch (Exception ex)

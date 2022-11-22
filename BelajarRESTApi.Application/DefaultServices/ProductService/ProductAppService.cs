@@ -3,6 +3,7 @@ using BelajarRESTApi.Application.DefaultServices.ProductService.Dto;
 using BelajarRESTApi.Application.Helpers;
 using BelajarRESTApi.Database.Databases;
 using BelajarRESTApi.Database.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -23,7 +24,7 @@ namespace BelajarRESTApi.Application.DefaultServices.ProductService
             _mapper = mapper;
         }
 
-        public PagedResult<ProductListDto> GetAllProducts(PageInfo pageinfo)
+        public async Task<PagedResult<ProductListDto>> GetAllProducts(PageInfo pageinfo)
         {
             var pagedResult = new PagedResult<ProductListDto>
             {
@@ -44,79 +45,79 @@ namespace BelajarRESTApi.Application.DefaultServices.ProductService
                 Total = _salesContext.Products.Count()
             };
 
-            return pagedResult;
+            return await Task.Run(() => pagedResult);
         }
 
-        public (bool, string) Create(CreateProductDto model)
+        public async Task<(bool, string)> Create(CreateProductDto model)
         {
             try
             {
                 var product = _mapper.Map<Product>(model);
 
-                _salesContext.Database.BeginTransaction();// Begin Transaction
+                await _salesContext.Database.BeginTransactionAsync();// Begin Transaction
                 _salesContext.Products.Add(product);
-                _salesContext.SaveChanges();
+                await _salesContext.SaveChangesAsync();
 
-                _salesContext.Database.CommitTransaction();// Commit
-                return (true, "Success");
+                await _salesContext.Database.CommitTransactionAsync();// Commit
+                return await Task.Run(() => (true, "Success"));
             }
             catch (DbException dbex)
             {
-                _salesContext.Database.RollbackTransaction();
-                return (false, dbex.Message);
+                await _salesContext.Database.RollbackTransactionAsync();
+                return await Task.Run(() => (false, dbex.Message));
             }
         }
 
-        public (bool, string) Delete(int id)
+        public async Task<(bool, string)> Delete(int id)
         {
             try
             {
-                var product = _salesContext.Products.FirstOrDefault(w => w.ProductId == id);
+                var product = await _salesContext.Products.FirstOrDefaultAsync(w => w.ProductId == id);
 
                 if (product != null)
                 {
-                    _salesContext.Database.BeginTransaction();
+                    await _salesContext.Database.BeginTransactionAsync();
                     _salesContext.Products.Remove(product);
-                    _salesContext.SaveChanges();
-                    _salesContext.Database.CommitTransaction();
+                    await _salesContext.SaveChangesAsync();
+                    await _salesContext.Database.CommitTransactionAsync();
                 }
-                return (true, "Success");
+                return await Task.Run(() => (true, "Success"));
             }
             catch (DbException dbex)
             {
-                _salesContext.Database.RollbackTransaction();
-                return (false, dbex.Message);
+                await _salesContext.Database.RollbackTransactionAsync();
+                return await Task.Run(() => (false, dbex.Message));
             }
         }
 
-        public (bool, string) Update(UpdateProductDto model)
+        public async Task<(bool, string)> Update(UpdateProductDto model)
         {
             try
             {
                 var product = _mapper.Map<Product>(model);
 
-                _salesContext.Database.BeginTransaction();
+                await _salesContext.Database.BeginTransactionAsync();
                 _salesContext.Products.Update(product);
-                _salesContext.SaveChanges();
+                await _salesContext.SaveChangesAsync();
 
-                _salesContext.Database.CommitTransaction();
-                return (true, "Success");
+                await _salesContext.Database.CommitTransactionAsync();
+                return await Task.Run(() => (true, "Success"));
             }
             catch (DbException dbex)
             {
-                _salesContext.Database.RollbackTransaction();
-                return (false, dbex.Message);
+                await _salesContext.Database.RollbackTransactionAsync();
+                return await Task.Run(() => (false, dbex.Message));
             }
         }
 
-        public UpdateProductDto GetProductByCode(string code)
+        public async Task<UpdateProductDto> GetProductByCode(string code)
         {
-            var product = _salesContext.Products.FirstOrDefault(w => w.ProductCode == code);
+            var product = await _salesContext.Products.FirstOrDefaultAsync(w => w.ProductCode == code);
             var productDto = _mapper.Map<UpdateProductDto>(product);
             return productDto;
         }
 
-        public PagedResult<ProductListDto> SearchProduct(string searchString, PageInfo pageInfo)
+        public async Task<PagedResult<ProductListDto>> SearchProduct(string searchString, PageInfo pageInfo)
         {
             var products = from product in _salesContext.Products
                            select product;
@@ -146,7 +147,7 @@ namespace BelajarRESTApi.Application.DefaultServices.ProductService
                 Total = _salesContext.Products.Count()
             };
 
-            return pagedResult;
+            return await Task.Run(() => pagedResult);
         }
     }
 }

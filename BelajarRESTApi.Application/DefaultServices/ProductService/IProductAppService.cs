@@ -11,11 +11,11 @@ namespace BelajarRESTApi.Application.DefaultServices.ProductService
 {
     public interface IProductAppService
     {
-        (bool, string) Create(CreateProductDto model);
-        (bool, string) Update(UpdateProductDto model);
-        (bool, string) Delete(int id);
-        PagedResult<ProductListDto> GetAllProducts(PageInfo pageinfo);
-        UpdateProductDto GetProductByCode(string code);
-        PagedResult<ProductListDto> SearchProduct(string searchString, PageInfo pageinfo);
+        Task<(bool, string)> Create(CreateProductDto model);
+        Task<(bool, string)> Update(UpdateProductDto model);
+        Task<(bool, string)> Delete(int id);
+        Task<PagedResult<ProductListDto>> GetAllProducts(PageInfo pageinfo);
+        Task<UpdateProductDto> GetProductByCode(string code);
+        Task<PagedResult<ProductListDto>> SearchProduct(string searchString, PageInfo pageinfo);
     }
 }
