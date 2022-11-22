@@ -39,6 +39,8 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+#region Hide
 //app.UseMiddleware<CustomExceptionMiddleware>();
 //app.UseMiddleware<CustomAuthHeaderMiddleware>();
 //app.UseHttpsRedirection();
@@ -57,5 +59,6 @@ app.MapControllers();
 //    // endpoints.MapGet("/", async context => { await context.Response.WriteAsync("Hello Enigma!"); });
 //    endpoints.MapControllers();
 //});
+#endregion
 
 app.Run();

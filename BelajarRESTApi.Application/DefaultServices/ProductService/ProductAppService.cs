@@ -5,6 +5,7 @@ using BelajarRESTApi.Database.Databases;
 using BelajarRESTApi.Database.Models;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -46,29 +47,66 @@ namespace BelajarRESTApi.Application.DefaultServices.ProductService
             return pagedResult;
         }
 
-        public void Create(CreateProductDto model)
+        public (bool, string) Create(CreateProductDto model)
         {
-            var product = _mapper.Map<Product>(model);
-            _salesContext.Products.Add(product);
-            _salesContext.SaveChanges();
-        }
-
-        public void Delete(int id)
-        {
-            var product = _salesContext.Products.FirstOrDefault(w => w.ProductId == id);
-
-            if (product != null)
+            try
             {
-                _salesContext.Products.Remove(product);
+                var product = _mapper.Map<Product>(model);
+
+                _salesContext.Database.BeginTransaction();// Begin Transaction
+                _salesContext.Products.Add(product);
                 _salesContext.SaveChanges();
+
+                _salesContext.Database.CommitTransaction();// Commit
+                return (true, "Success");
+            }
+            catch (DbException dbex)
+            {
+                _salesContext.Database.RollbackTransaction();
+                return (false, dbex.Message);
             }
         }
 
-        public void Update(UpdateProductDto model)
+        public (bool, string) Delete(int id)
         {
-            var product = _mapper.Map<Product>(model);
-            _salesContext.Products.Update(product);
-            _salesContext.SaveChanges();
+            try
+            {
+                var product = _salesContext.Products.FirstOrDefault(w => w.ProductId == id);
+
+                if (product != null)
+                {
+                    _salesContext.Database.BeginTransaction();
+                    _salesContext.Products.Remove(product);
+                    _salesContext.SaveChanges();
+                    _salesContext.Database.CommitTransaction();
+                }
+                return (true, "Success");
+            }
+            catch (DbException dbex)
+            {
+                _salesContext.Database.RollbackTransaction();
+                return (false, dbex.Message);
+            }
+        }
+
+        public (bool, string) Update(UpdateProductDto model)
+        {
+            try
+            {
+                var product = _mapper.Map<Product>(model);
+
+                _salesContext.Database.BeginTransaction();
+                _salesContext.Products.Update(product);
+                _salesContext.SaveChanges();
+
+                _salesContext.Database.CommitTransaction();
+                return (true, "Success");
+            }
+            catch (DbException dbex)
+            {
+                _salesContext.Database.RollbackTransaction();
+                return (false, dbex.Message);
+            }
         }
 
         public UpdateProductDto GetProductByCode(string code)
