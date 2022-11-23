@@ -2,6 +2,7 @@
 using BelajarRESTApi.Application.DefaultServices.ProductService.Dto;
 using BelajarRESTApi.Application.Helpers;
 using BelajarRESTApi.Application.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,6 +21,7 @@ namespace BelajarRESTApi.Controllers
 
         [HttpGet("GetAllProduct")]
         [Produces("application/json")]
+        [Authorize] // diperlukan otorisasi ketika ingin mengakses si API
         public async Task<IActionResult> GetAllProduct([FromQuery] PageInfo pageinfo)
         {
             //// FromBody tidak bisa di gunakan untuk method HttpGet
@@ -42,6 +44,7 @@ namespace BelajarRESTApi.Controllers
         }
 
         [HttpPost("SaveProduct")]
+        [Authorize]
         public async Task<IActionResult> SaveProduct([FromBody] CreateProductDto model)
         {
             try
@@ -61,6 +64,7 @@ namespace BelajarRESTApi.Controllers
         }
 
         [HttpGet("GetProductByCode")]
+        [Authorize]
         public async Task<IActionResult> GetProductByCode(string code)
         {
             try
@@ -80,6 +84,7 @@ namespace BelajarRESTApi.Controllers
         }
 
         [HttpDelete("DeleteProduct")]
+        [Authorize]
         public async Task<IActionResult> DeleteProduct(int Id)
         {
             try
@@ -99,6 +104,7 @@ namespace BelajarRESTApi.Controllers
         }
 
         [HttpPatch("UpdateProduct")]
+        [Authorize]
         public async Task<IActionResult> UpdateProduct([FromBody] UpdateProductDto model)
         {
             try
@@ -118,6 +124,7 @@ namespace BelajarRESTApi.Controllers
         }
 
         [HttpGet("SearchProduct")]
+        [AllowAnonymous]
         public async Task<IActionResult> SearchProduct(string searchString, [FromQuery] PageInfo pageInfo)
         {
             try
