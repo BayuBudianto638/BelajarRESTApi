@@ -34,4 +34,8 @@
     <ProjectReference Include="..\BelajarRESTApi.Database\BelajarRESTApi.Database.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DefaultServices\" />
+  </ItemGroup>
+
 </Project>

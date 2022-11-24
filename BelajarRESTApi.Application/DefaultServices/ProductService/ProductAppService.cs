@@ -54,11 +54,11 @@ namespace BelajarRESTApi.Application.DefaultServices.ProductService
             {
                 var product = _mapper.Map<Product>(model);
 
-                await _salesContext.Database.BeginTransactionAsync();// Begin Transaction
+                //await _salesContext.Database.BeginTransactionAsync();// Begin Transaction
                 _salesContext.Products.Add(product);
-                await _salesContext.SaveChangesAsync();
+                _salesContext.SaveChanges();
 
-                await _salesContext.Database.CommitTransactionAsync();// Commit
+                //await _salesContext.Database.CommitTransactionAsync();// Commit
                 return await Task.Run(() => (true, "Success"));
             }
             catch (DbException dbex)
