@@ -16,11 +16,26 @@ using System.Threading.Tasks;
 using System.Collections;
 using BelajarRESTApi.Application.ConfigProfile;
 using Microsoft.Extensions.DependencyInjection;
+using BelajarRESTApi.Controllers;
+using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
+using Azure.Core;
+using System.Reflection.Metadata;
+using BelajarRESTApi.Database.Models;
 
 namespace BelajarRESTApi.UnitTest
 {
-    public class ProductAppServiceTests
+    public class ProductAppServiceTests : IClassFixture<Startup>
     {
+        private ServiceProvider _serviceProvider;
+        //private ProductAppService _service;
+
+        public ProductAppServiceTests(Startup fixture)
+        {
+            _serviceProvider = fixture.ServiceProvider;
+        }
+
+
         [Fact]
         public void GetAllProducts()
         {
@@ -81,19 +96,35 @@ namespace BelajarRESTApi.UnitTest
         }
 
         [Fact]
-        public void GetProductByCode()
+        public async void GetProductByCode()
         {
             // Arrange
             var productAppService = new Mock<IProductAppService>();
+            var mockSet = new Mock<DbSet<Product>>();
+
+            var mockContext = new Mock<SalesContext>();
+            var mockMapper = new Mock<IMapper>();
+            var mockService = new Mock<ProductAppService>();
+            mockContext.Setup(m => m.Products).Returns(mockSet.Object);
+
+            ProductAppService service = new ProductAppService(mockContext.Object, mockMapper.Object);
+
             string code = "PRD-001";
 
-            Task<UpdateProductDto> productDto = null;
+            UpdateProductDto productDto = new UpdateProductDto();
+            productDto.ProductId = 1;
+            productDto.ProductCode = "PRD-001";
+            productDto.ProductName = "TEST";
+            productDto.ProductPrice = 1000;
+            productDto.ProductQty = 1;
+            productDto.SupplierId = 1;
 
             // Act
-            var result = productAppService.Setup(service => service.GetProductByCode(code)).Returns(productDto);
+            productAppService.Setup(service => service.GetProductByCode(code)).ReturnsAsync(productDto);
+            var result = await service.GetProductByCode(code);
 
             // Assert
-            Assert.NotNull(result);
+            Assert.Equal(productDto.ProductCode, result.ProductCode);
         }
 
         [Fact]

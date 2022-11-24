@@ -32,6 +32,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BelajarRESTApi.Application\BelajarRESTApi.Application.csproj" />
     <ProjectReference Include="..\BelajarRESTApi.Database\BelajarRESTApi.Database.csproj" />
+    <ProjectReference Include="..\BelajarRESTApi\BelajarRESTApi.csproj" />
   </ItemGroup>
 
   <ItemGroup>

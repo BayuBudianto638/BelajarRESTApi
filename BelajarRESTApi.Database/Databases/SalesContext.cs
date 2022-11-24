@@ -19,5 +19,7 @@ namespace BelajarRESTApi.Database.Databases
         {
 
         }
+
+        public SalesContext() { }
     }
 }

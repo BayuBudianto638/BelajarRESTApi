@@ -28,8 +28,7 @@ namespace BelajarRESTApi.UnitTest
         [Fact]
         public async Task Create()
         {
-            var mockArticleRepository = new MockProductAppServiceTests()
-                .GetAllProduct();
+            var mockArticleRepository = new MockProductAppServiceTests();
 
             var result = mockArticleRepository.CreateProduct();
 
